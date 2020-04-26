@@ -10,12 +10,12 @@ a_sb_db = 10; % minimum attenuation in stopband
 a_sb = 1/power(10, -a_sb_db/20);
 
 fs = 1000;
-t = 1/fs;
+ts = 1/fs;
 
 % prewarp if necessary
-om_warp = 0.3/t; % = 300 rad/s, both omc and omr need prewarping
-omc_s = 2/t * tan(omc_z * t / 2);
-omr_s = 2/t * tan(omr_z * t / 2);
+om_warp = 0.3/ts; % = 300 rad/s, both omc and omr need prewarping
+omc_s = 2/ts * tan(omc_z * ts / 2);
+omr_s = 2/ts * tan(omr_z * ts / 2);
 
 
 %% part 1, butterworth, indirect approach
@@ -44,6 +44,13 @@ ep = sqrt(power(10, a_pb_db / 10) - 1);
 order = ceil(acosh(power(10, a_sb/20 - log10(ep^2))) / acosh(omr_s / omc_s));
 
 [num, den] = cheby1(3, a_pb_db, fc_z / (fs/2));
+figure
+freqz(num, den, 256, fs)
+
+
+%% extra credit, transform 1 LPF to HPF
+
+[num, den] = iirlp2hp(num, den, 0.5, 0.5);
 figure
 freqz(num, den, 256, fs)
 
