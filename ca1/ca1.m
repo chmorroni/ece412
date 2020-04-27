@@ -20,21 +20,25 @@ omr_s = 2/ts * tan(omr_z * ts / 2);
 
 %% part 1, butterworth, indirect approach
 
-order = ceil(log10(a_sb^2 - 1) / (2 * log10(omr_s/omc_s))); % = 3
+order = ceil(log10(a_sb^2 - 1) / (2 * log10(omr_s / omc_s))); % = 3
 [z, p, k] = buttap(order);
 [num_s, den_s] = zp2tf(z, p, k);
 [num_s, den_s] = lp2lp(num_s, den_s, omc_s);
 
 [num_z, den_z] = bilinear(num_s, den_s, fs);
 figure
-freqz(num_z, den_z, 256, fs);
+freqz(num_z, den_z, linspace(0, 200, 256), fs);
+grid on
+title("Butterworth Filter Plot")
 
 
 %% part 1, butterworth, direct approach
 
 [num, den] = butter(order, fc_z / (fs/2));
 figure
-freqz(num, den, 256, fs)
+freqz(num, den, linspace(0, 200, 256), fs)
+grid on
+title("Butterworth Filter Plot")
 
 
 %% part 2, chebyshev
@@ -45,23 +49,28 @@ order = ceil(acosh(power(10, a_sb/20 - log10(ep^2))) / acosh(omr_s / omc_s));
 
 [num, den] = cheby1(3, a_pb_db, fc_z / (fs/2));
 figure
-freqz(num, den, 256, fs)
+freqz(num, den, linspace(0, 200, 256), fs)
+grid on
+title("Chebyshev Filter Plot")
 
 
 %% extra credit, transform 1 LPF to HPF
 
-[num, den] = iirlp2hp(num, den, 0.5, 0.5);
+[num, den] = iirlp2hp(num, den, (fc_z / (fs/2)), (1 - fc_z / (fs/2)));
 figure
-freqz(num, den, 256, fs)
+freqz(num, den, linspace(300, 500, 256), fs)
+grid on
+title("Chebyshev High Pass Filter Plot")
 
 
 %% part 3, bessel
 
-%d0 = power(omc_s, order); % same order as part 2 (3)
 num_s = 15;
 den_s = [1 6 15 15]; % 3rd order bessel
 [num_s, den_s] = lp2lp(num_s, den_s, omc_s);
 
 [num_z, den_z] = bilinear(num_s, den_s, fs);
 figure
-freqz(num_z, den_z, 256, fs)
+freqz(num_z, den_z, linspace(0, 200, 256), fs)
+grid on
+title("Bessel Filter Plot")
